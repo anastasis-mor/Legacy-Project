@@ -1,0 +1,41 @@
+/* Add some padding to the container */
+.container {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+/* Style the post cards */
+.card {
+  border: none;
+  border-radius: 10px;
+}
+
+/* Style the post input textarea */
+.form-control {
+  border-radius: 8px;
+}
+
+/* Style the submit button */
+.btn-primary {
+  background-color: #1f4529; 
+  border: none;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.btn-primary:hover {
+  background-color: #16381f; 
+}
+
+/* Style the posts list */
+.list-group-item {
+  border: none;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  background-color: #ffffff;
+}
+
+/* Style the timestamp */
+.text-muted {
+  font-size: 0.9em;
+}

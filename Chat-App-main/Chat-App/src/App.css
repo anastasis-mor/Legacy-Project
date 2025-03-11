@@ -1,0 +1,52 @@
+body {
+  margin: 0;
+  box-sizing: border-box;
+  background-color: #1f4529;
+  height: 100vh;
+}
+h1 {
+  font-family: 'Georgia', serif;
+  text-align: center;
+  color: #ffffff;
+}
+.form-field .btn {
+  color: #ffffff;
+  border: 1px solid #eed3b1;
+}
+.form-field .btn:hover {
+  background-color: #eed3b1;
+  border: 1px solid #eed3b1;
+  color: #1f4529;
+}
+.form-field .btn:active {
+  background-color: #e8ecd7;
+}
+.form-field {
+  max-width: 600px;
+  margin: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100vh;
+}
+.register-link{
+  text-decoration: none; 
+  color: #ffffff;
+}
+
+.register-link:hover {
+  color: #eed3b1; /* Change color on hover */
+  text-decoration: underline; /* Add underline on hover */
+}
+
+.login-field{
+  text-decoration: none;
+  display: flex;
+  justify-content: space-between;
+}
+
+.login-register-bg {
+  background-color: #47663B; 
+  height: 100vh;
+}
