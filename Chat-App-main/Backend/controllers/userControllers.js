@@ -65,17 +65,34 @@ const loginUser = async (req, res) => {
     res.header('auth-token', token).send(token);
 }
 
-const getUserById = async (req, res) => {
-    try {
-        const user = await User.findById(req.params.id);
-        if (!user) {
-            return res.status(404).send('User not found');
+    // Update the user information
+    
+    const updateUser = async (req, res) => {
+        try {
+            const { id } = req.params;
+            const updates = req.body;
+            if (updates.password) {
+                const saltRounds = Number(process.env.SALT_ROUNDS);
+                const salt = await bcrypt.genSalt(saltRounds);
+                updates.password = await bcrypt.hash(updates.password, salt);
+            }
+            const updatedUser = await User.findByIdAndUpdate(id, updates, { new: true });
+            res.status(200).json(updatedUser);
+        }catch (error) {
+            res.status(500).json({ message: "Server error", error: error.message });
         }
-        res.send(user);
-    } catch (error) {
-        res.status(500).json({ message: "Server error", error: error.message });       
     }
-}
+    const getUserById = async (req, res) => {
+        try {
+            const user = await User.findById(req.params.id);
+            if (!user) {
+                return res.status(404).send('User not found');
+            }
+            res.send(user);
+        } catch (error) {
+            res.status(500).json({ message: "Server error", error: error.message });       
+        }
+    }
 
 
-module.exports = { registerUser, loginUser, getUserById };
+module.exports = { registerUser, loginUser, getUserById, updateUser };
