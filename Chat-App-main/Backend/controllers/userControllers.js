@@ -8,10 +8,10 @@ const { get } = require('mongoose');
 
 const registerUser = async (req, res) => {
     // Validate the data before creating a user
-    const { error } = registerValidation(req.body);
-    if (error) {
-        return res.status(400).send(error);
-    }
+    // const { error } = registerValidation(req.body);
+    // if (error) {
+    //     return res.status(400).send(error);
+    // }
 
     // Check if the user is already in the database
     const emailExist = await User.findOne({ email: req.body.email });
@@ -43,10 +43,10 @@ const registerUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
     // Validate the data before logging in a user
-    const { error } = loginValidation(req.body);
-    if (error) {
-        return res.status(400).send(error);
-    }
+    // const { error } = loginValidation(req.body);
+    // if (error) {
+    //     return res.status(400).send(error);
+    // }
 
     // Check if the email exists
     const user = await User.findOne({ email: req.body.email });
@@ -73,8 +73,7 @@ const getUserById = async (req, res) => {
         }
         res.send(user);
     } catch (error) {
-        res.status(400).send
-        
+        res.status(500).json({ message: "Server error", error: error.message });       
     }
 }
 

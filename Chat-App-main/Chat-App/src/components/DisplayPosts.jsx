@@ -89,6 +89,9 @@ function DisplayPosts() {
         <Container>
           <Navbar.Brand>Chat App</Navbar.Brand>
           <Nav className="me-auto">
+          {user && (
+            <Nav.Link onClick={() => navigate(`/profile/${user._id}`)}>Profile</Nav.Link>
+          )}
             <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
           </Nav>
         </Container>
