@@ -1,4 +1,5 @@
 const Chat = require('../models/chatModel');
+const User = require('../models/userModels');
 
 // Get all chats
 const getAllChats = async (req, res) => {
@@ -14,7 +15,13 @@ const getAllChats = async (req, res) => {
 
 const createChat = async (req, res) => {
     try {
-        const newChat = await new Chat(req.body);
+        const user = await User.findById(req.user._id);
+        const newChat = await new Chat({
+            message: req.body.message,
+            sender: user.name,
+            senderId: user._id,
+            image: req.body.image  
+    });
         await newChat.save();
         res.status(201).json(newChat);
     } catch (error) {

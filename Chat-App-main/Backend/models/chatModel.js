@@ -8,6 +8,14 @@ const chatSchema = new mongoose.Schema({
     sender: {
         type: String,
         required: true
+    },
+    senderId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    image: {
+        type: String
     }
 }, {timestamps: true});
 
