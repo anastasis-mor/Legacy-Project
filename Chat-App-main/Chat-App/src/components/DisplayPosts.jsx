@@ -1,14 +1,24 @@
 import { useEffect, useState } from "react";
 import "./DisplayPosts.css";
 import axios from "axios";
-import { jwtDecode } from "jwt-decode"; 
-import { Container, Card, Form, Button, ListGroup, Navbar, Nav } from "react-bootstrap"; // Import Navbar and Nav
-import { useNavigate } from "react-router-dom"; 
+import { jwtDecode } from "jwt-decode";
+import {
+  Container,
+  Card,
+  Form,
+  Button,
+  ListGroup,
+  Navbar,
+  Nav,
+} from "react-bootstrap"; // Import Navbar and Nav
+import { useNavigate } from "react-router-dom";
 
 function DisplayPosts() {
   const [posts, setPosts] = useState([]);
   const [postDescription, setPostDescription] = useState("");
   const [user, setUser] = useState(null); // State to store the logged-in user's details
+  const [isEditing, setIsEditing] = useState(false); // State to check if the user is editing a post
+  const [editPostId, setEditPostId] = useState(null); // State to store the ID of the post being edited
   const navigate = useNavigate(); // For navigation
 
   // Fetch all posts from the database
@@ -34,9 +44,12 @@ function DisplayPosts() {
         const userId = decoded._id;
 
         // Fetch the user's details from the backend
-        const userRes = await axios.get(`http://localhost:5000/user/${userId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const userRes = await axios.get(
+          `http://localhost:5000/user/${userId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
 
         setUser(userRes.data); // Store the user's details in state
       } catch (error) {
@@ -65,9 +78,13 @@ function DisplayPosts() {
     };
 
     try {
-      const res = await axios.post("http://localhost:5000/chat/create", newPost, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await axios.post(
+        "http://localhost:5000/chat/create",
+        newPost,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       setPosts([res.data, ...posts]); // Add the new post at the top of the list
       setPostDescription("");
@@ -82,6 +99,25 @@ function DisplayPosts() {
     navigate("/login"); // Redirect to the login page
   };
 
+  //Function to delete a post
+  async function deletePost(postId) {
+    try {
+      if (window.confirm("Are you sure you want to delete this post?")) {
+        const token = localStorage.getItem("auth-token");
+        let response = await axios.delete(
+          `http://localhost:5000/chat/${postId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        alert(response.data.message);
+        setPosts(getAllPosts());
+      }
+    } catch (error) {
+      console.log("Error deleting post", error);
+    }
+  }
+
   return (
     <>
       {/* Navbar with Logout Button */}
@@ -89,9 +125,11 @@ function DisplayPosts() {
         <Container>
           <Navbar.Brand>Chat App</Navbar.Brand>
           <Nav className="me-auto">
-          {user && (
-            <Nav.Link onClick={() => navigate(`/profile/${user._id}`)}>Profile</Nav.Link>
-          )}
+            {user && (
+              <Nav.Link onClick={() => navigate(`/profile/${user._id}`)}>
+                Profile
+              </Nav.Link>
+            )}
             <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
           </Nav>
         </Container>
@@ -139,6 +177,18 @@ function DisplayPosts() {
                       <small className="text-muted">
                         {new Date(post.createdAt).toLocaleString()}
                       </small>
+                      <div>
+                        {/* Show delete button only if the logged-in user created the post */}
+                        {user && post.senderId === user._id && (
+                          <Button
+                            variant="outline-danger"
+                            size="sm"
+                            onClick={() => deletePost(post._id)}
+                          >
+                            Delete
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   </ListGroup.Item>
                 ))}

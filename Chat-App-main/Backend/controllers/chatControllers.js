@@ -1,4 +1,6 @@
 const Chat = require('../models/chatModel');
+const User = require('../models/userModels');
+
 
 // Get all chats
 const getAllChats = async (req, res) => {
@@ -14,7 +16,15 @@ const getAllChats = async (req, res) => {
 
 const createChat = async (req, res) => {
     try {
-        const newChat = await new Chat(req.body);
+    //    const token = req.header.authorization.split(" ")[1]; // Get the token from the header
+        //  const decoded = jwt.verify(token, process.env.JWT_SECRET); // Decode the token
+         const user = await User.findById(req.user._id); // Find the user by id from DB
+        
+        const newChat = await new Chat({
+            message: req.body.message,
+            sender: user.name,
+            senderId: user._id  //store the user id of the sender
+    });
         await newChat.save();
         res.status(201).json(newChat);
     } catch (error) {
