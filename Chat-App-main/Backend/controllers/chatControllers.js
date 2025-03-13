@@ -58,7 +58,7 @@ const deleteChat = async (req, res) => {
         if (!deleteChat) {
             res.status(404).json({ message: 'Chat not found' });
         }
-        res.status(200).json(deleteChat);
+        res.status(200).json({deleteChat, msg: 'Chat deleted successfully'});
     } catch (error) {
         res.status(500).json({ message: error.message, Second: "At Delete" });
     }

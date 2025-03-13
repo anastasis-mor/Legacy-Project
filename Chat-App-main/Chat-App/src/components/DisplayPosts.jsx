@@ -105,13 +105,14 @@ function DisplayPosts() {
       if (window.confirm("Are you sure you want to delete this post?")) {
         const token = localStorage.getItem("auth-token");
         let response = await axios.delete(
-          `http://localhost:5000/chat/${postId}`,
+          `http://localhost:5000/chat/delete/${postId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-        alert(response.data.message);
-        setPosts(getAllPosts());
+        alert(response.data.msg);
+        console.log("Post deleted", response.data);
+        getAllPosts();
       }
     } catch (error) {
       console.log("Error deleting post", error);
@@ -167,7 +168,7 @@ function DisplayPosts() {
               <p className="text-center">No posts available</p>
             ) : (
               <ListGroup>
-                {posts.map((post) => (
+                {posts&&posts.map((post) => (
                   <ListGroup.Item key={post._id} className="mb-3 shadow-sm">
                     <div className="d-flex justify-content-between align-items-center">
                       <div>
