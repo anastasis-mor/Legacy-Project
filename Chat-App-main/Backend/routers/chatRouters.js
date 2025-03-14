@@ -8,5 +8,6 @@ router.post('/create',authenticate, createChat);
 router.put('/update/:id', updateChat);
 router.delete('/delete/:id', deleteChat);
 
+
 module.exports = router;
 // Compare this snippet from models/chatModel.js: 
