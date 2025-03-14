@@ -8,8 +8,25 @@ import { useNavigate } from "react-router-dom";
 function DisplayPosts() {
   const [posts, setPosts] = useState([]);
   const [postDescription, setPostDescription] = useState("");
+  const [image, setImage] = useState(""); // State to store the image file
   const [user, setUser] = useState(null); // State to store the logged-in user's details
+  const [isEditing, setIsEditing] = useState(false);
+  const [editPostId, setEditPostId] = useState(null);
   const navigate = useNavigate(); // For navigation
+
+  // Function to handle file change
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+  
+    reader.onloadend = () => {
+      setImage(reader.result); // This is the base64 string
+    };
+  
+    if (file) {
+      reader.readAsDataURL(file);
+    }
+  };
 
   // Fetch all posts from the database
   const getAllPosts = async () => {
@@ -62,6 +79,7 @@ function DisplayPosts() {
     const newPost = {
       message: postDescription,
       sender: user.name, // Use the user's name as the sender
+      image: image
     };
 
     try {
@@ -75,6 +93,25 @@ function DisplayPosts() {
       console.log("Error posting new post", error);
     }
   };
+
+  async function deletePost(postId) {
+    try {
+      if (window.confirm("Are you sure you want to delete this post?")) {
+        const token = localStorage.getItem("auth-token");
+        let response = await axios.delete(
+          `http://localhost:5000/chat/delete/${postId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        alert(response.data.message);
+        console.log("Post deleted", response.data);
+        getAllPosts();
+      }
+    } catch (error) {
+      console.log("Error deleting post", error);
+    }
+  }
 
   // Logout function
   const handleLogout = () => {
@@ -112,6 +149,13 @@ function DisplayPosts() {
                   onChange={(e) => setPostDescription(e.target.value)}
                   required
                 />
+                  <Form.Group className="mb-3">
+                  <Form.Control
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                  />
+                </Form.Group>
               </Form.Group>
               <div className="d-grid">
                 <Button variant="primary" type="submit">
@@ -135,10 +179,25 @@ function DisplayPosts() {
                       <div>
                         <strong>{post.sender}</strong>
                         <p className="mb-0">{post.message}</p>
+                        {post.image && (
+                          <img src={post.image} alt="post" className="post-image" />
+                        )}
                       </div>
                       <small className="text-muted">
                         {new Date(post.createdAt).toLocaleString()}
                       </small>
+                      <div>
+                        {/* Show delete button only if the logged-in user created the post */}
+                        {user && post.senderId === user._id && (
+                          <Button
+                            variant="outline-danger"
+                            size="sm"
+                            onClick={() => deletePost(post._id)}
+                          >
+                            Delete
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   </ListGroup.Item>
                 ))}
