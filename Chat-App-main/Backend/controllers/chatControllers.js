@@ -15,11 +15,13 @@ const getAllChats = async (req, res) => {
 
 const createChat = async (req, res) => {
     try {
-        const user = await User.findById(req.user._id);
+        //  const token = req.header.authorization.split(" ")[1]; // Get the token from the header
+        //  const decoded = jwt.verify(token, process.env.JWT_SECRET); // Decode the token
+        const user = await User.findById(req.user._id);  // Find the user by id from DB
         const newChat = await new Chat({
             message: req.body.message,
             sender: user.name,
-            senderId: user._id,
+            senderId: user._id, //store the user id of the sender
             image: req.body.image  
     });
         await newChat.save();
@@ -55,7 +57,7 @@ const deleteChat = async (req, res) => {
         if (!deleteChat) {
             res.status(404).json({ message: 'Chat not found' });
         }
-        res.status(200).json(deleteChat);
+        res.status(200).json({deleteChat, msg: 'Chat deleted successfully'});
     } catch (error) {
         res.status(500).json({ message: error.message, Second: "At Delete" });
     }

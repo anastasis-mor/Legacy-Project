@@ -1,17 +1,25 @@
 import { useEffect, useState } from "react";
 import "./DisplayPosts.css";
 import axios from "axios";
-import { jwtDecode } from "jwt-decode"; 
-import { Container, Card, Form, Button, ListGroup, Navbar, Nav } from "react-bootstrap"; // Import Navbar and Nav
-import { useNavigate } from "react-router-dom"; 
+import { jwtDecode } from "jwt-decode";
+import {
+  Container,
+  Card,
+  Form,
+  Button,
+  ListGroup,
+  Navbar,
+  Nav,
+} from "react-bootstrap"; // Import Navbar and Nav
+import { useNavigate } from "react-router-dom";
 
 function DisplayPosts() {
   const [posts, setPosts] = useState([]);
   const [postDescription, setPostDescription] = useState("");
   const [image, setImage] = useState(""); // State to store the image file
   const [user, setUser] = useState(null); // State to store the logged-in user's details
-  const [isEditing, setIsEditing] = useState(false);
-  const [editPostId, setEditPostId] = useState(null);
+  const [isEditing, setIsEditing] = useState(false); // State to check if the user is editing a post
+  const [editPostId, setEditPostId] = useState(null); // State to store the ID of the post being edited
   const navigate = useNavigate(); // For navigation
 
   // Function to handle file change
@@ -51,9 +59,12 @@ function DisplayPosts() {
         const userId = decoded._id;
 
         // Fetch the user's details from the backend
-        const userRes = await axios.get(`http://localhost:5000/user/${userId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const userRes = await axios.get(
+          `http://localhost:5000/user/${userId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
 
         setUser(userRes.data); // Store the user's details in state
       } catch (error) {
@@ -83,9 +94,13 @@ function DisplayPosts() {
     };
 
     try {
-      const res = await axios.post("http://localhost:5000/chat/create", newPost, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await axios.post(
+        "http://localhost:5000/chat/create",
+        newPost,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       setPosts([res.data, ...posts]); // Add the new post at the top of the list
       setPostDescription("");
@@ -119,6 +134,26 @@ function DisplayPosts() {
     navigate("/login"); // Redirect to the login page
   };
 
+  //Function to delete a post
+  async function deletePost(postId) {
+    try {
+      if (window.confirm("Are you sure you want to delete this post?")) {
+        const token = localStorage.getItem("auth-token");
+        let response = await axios.delete(
+          `http://localhost:5000/chat/delete/${postId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        alert(response.data.msg);
+        console.log("Post deleted", response.data);
+        getAllPosts();
+      }
+    } catch (error) {
+      console.log("Error deleting post", error);
+    }
+  }
+
   return (
     <>
       {/* Navbar with Logout Button */}
@@ -126,9 +161,11 @@ function DisplayPosts() {
         <Container>
           <Navbar.Brand>Chat App</Navbar.Brand>
           <Nav className="me-auto">
-          {user && (
-            <Nav.Link onClick={() => navigate(`/profile/${user._id}`)}>Profile</Nav.Link>
-          )}
+            {user && (
+              <Nav.Link onClick={() => navigate(`/profile/${user._id}`)}>
+                Profile
+              </Nav.Link>
+            )}
             <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
           </Nav>
         </Container>
@@ -173,7 +210,7 @@ function DisplayPosts() {
               <p className="text-center">No posts available</p>
             ) : (
               <ListGroup>
-                {posts.map((post) => (
+                {posts&&posts.map((post) => (
                   <ListGroup.Item key={post._id} className="mb-3 shadow-sm">
                     <div className="d-flex justify-content-between align-items-center">
                       <div>
