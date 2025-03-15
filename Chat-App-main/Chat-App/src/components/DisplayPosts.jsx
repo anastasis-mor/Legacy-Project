@@ -19,7 +19,8 @@ function DisplayPosts() {
   const [image, setImage] = useState(""); // State to store the image file
   const [user, setUser] = useState(null); // State to store the logged-in user's details
   const [isEditing, setIsEditing] = useState(false); // State to check if the user is editing a post
-  const [editPostId, setEditPostId] = useState(null); // State to store the ID of the post being edited
+  const [editingPostId, setEditingPostId] = useState(null); // State to store the ID of the post being edited
+  const [editPostDescription, setEditPostDescription] = useState(""); // State to store the edited post description
   const navigate = useNavigate(); // For navigation
 
   // Function to handle file change
@@ -128,6 +129,36 @@ function DisplayPosts() {
     }
   }
 
+  // Edit post function
+  const handleEditPost = async (e, postId) => {
+    e.preventDefault();
+    
+    try {
+      const token = localStorage.getItem("auth-token");
+      await axios.put(`http://localhost:5000/chat/update/${postId}`, 
+        { message: editPostDescription },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+  
+      setPosts(posts.map(post => 
+        post._id === postId ? { ...post, message: editPostDescription } : post
+      ));
+      setEditingPostId(null);
+    } catch (error) {
+      console.log("Error updating post", error);
+    }
+  };
+  
+
+  //Handle Click on Edit Button
+  const handleEditClick = (post) => {
+    setEditingPostId(post._id);
+    setEditPostDescription(post.message);
+
+  };
+  
+
+
   // Logout function
   const handleLogout = () => {
     localStorage.removeItem("auth-token"); // Remove the token from localStorage
@@ -210,34 +241,68 @@ function DisplayPosts() {
               <p className="text-center">No posts available</p>
             ) : (
               <ListGroup>
-                {posts&&posts.map((post) => (
-                  <ListGroup.Item key={post._id} className="mb-3 shadow-sm">
-                    <div className="d-flex justify-content-between align-items-center">
-                      <div>
-                        <strong>{post.sender}</strong>
-                        <p className="mb-0">{post.message}</p>
-                        {post.image && (
-                          <img src={post.image} alt="post" className="post-image" />
-                        )}
-                      </div>
-                      <small className="text-muted">
-                        {new Date(post.createdAt).toLocaleString()}
-                      </small>
-                      <div>
-                        {/* Show delete button only if the logged-in user created the post */}
-                        {user && post.senderId === user._id && (
-                          <Button
-                            variant="outline-danger"
-                            size="sm"
-                            onClick={() => deletePost(post._id)}
-                          >
-                            Delete
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  </ListGroup.Item>
-                ))}
+                {posts.map((post) => (
+  <ListGroup.Item key={post._id} className="mb-3 shadow-sm">
+    <div className="d-flex justify-content-between align-items-center">
+      <div>
+        <strong>{post.sender}</strong>
+        {editingPostId === post._id ? (
+          <Form onSubmit={(e) => handleEditPost(e, post._id)}>
+            <Form.Control
+              type="text"
+              value={editPostDescription}
+              onChange={(e) => setEditPostDescription(e.target.value)}
+              required
+            />
+            <Button variant="success" type="submit" size="sm" className="mt-2">
+              Save
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              className="mt-2 ms-2"
+              onClick={() => setEditingPostId(null)}
+            >
+              Cancel
+            </Button>
+          </Form>
+        ) : (
+          <p className="mb-0">{post.message}</p>
+        )}
+        {post.image && <img src={post.image} alt="post" className="post-image" />}
+      </div>
+       {/* Time and Buttons Section */}
+       <div className="d-flex flex-column align-items-end">
+        {/* Post Timestamp Positioned at Top */}
+        <small className="text-muted mb-2">
+          {new Date(post.createdAt).toLocaleString()}
+        </small>
+
+        {/* Edit and Delete Buttons Positioned Below Time */}
+        {user && post.senderId === user._id && (
+          <div>
+            <Button
+              variant="outline-primary"
+              size="sm"
+              onClick={() => handleEditClick(post)}
+              className="mb-2 mb-md-0 me-md-2"
+            >
+              Edit
+            </Button>
+            <Button
+              variant="outline-danger"
+              size="sm"
+              onClick={() => deletePost(post._id)}
+            >
+              Delete
+            </Button>
+            </div>
+        )}
+      </div>
+    </div>
+  </ListGroup.Item>
+))}
+
               </ListGroup>
             )}
           </Card.Body>
