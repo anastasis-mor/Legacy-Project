@@ -47,3 +47,14 @@
   margin-top: 10px;
   border-radius: 8px;
 }
+
+.profile-picture {
+  object-fit: cover;
+  border: 1px solid #dee2e6;
+}
+
+.post-image {
+  max-width: 100%;
+  max-height: 500px;
+  border-radius: 8px;
+}

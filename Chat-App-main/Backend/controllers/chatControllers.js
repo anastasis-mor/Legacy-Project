@@ -4,7 +4,7 @@ const User = require('../models/userModels');
 // Get all chats
 const getAllChats = async (req, res) => {
     try {
-        const chats = await Chat.find();
+        const chats = await Chat.find().populate('senderId', 'name profilePicture');
         res.status(200).json(chats);
     } catch (error) {
         res.status(500).json({ message: error.message });
