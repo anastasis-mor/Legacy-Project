@@ -245,6 +245,15 @@ function DisplayPosts() {
   <ListGroup.Item key={post._id} className="mb-3 shadow-sm">
     <div className="d-flex justify-content-between align-items-center">
       <div>
+      <div className="me-3">
+          <img 
+            src={post.senderId?.profilePicture || "https://via.placeholder.com/40"} 
+            alt={`${post.sender}'s profile`} 
+            className="profile-picture rounded-circle"
+            width="40"
+            height="40"
+          />
+        </div>
         <strong>{post.sender}</strong>
         {editingPostId === post._id ? (
           <Form onSubmit={(e) => handleEditPost(e, post._id)}>
@@ -279,7 +288,7 @@ function DisplayPosts() {
         </small>
 
         {/* Edit and Delete Buttons Positioned Below Time */}
-        {user && post.senderId === user._id && (
+        {user && post.senderId?._id === user._id && (
           <div>
             <Button
               variant="outline-primary"

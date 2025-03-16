@@ -94,5 +94,32 @@ const loginUser = async (req, res) => {
         }
     }
 
-
-module.exports = { registerUser, loginUser, getUserById, updateUser };
+    // Upload profile picture
+    const uploadProfilePicture = async (req, res) => {
+        try {
+            const { profilePicture } = req.body;
+            
+            if (!profilePicture) {
+                return res.status(400).json({ message: "No image provided" });
+            }
+            
+            // Update user with base64 image string
+            const updatedUser = await User.findByIdAndUpdate(
+                req.user._id,
+                { profilePicture },
+                { new: true }
+            );
+            
+            if (!updatedUser) {
+                return res.status(404).json({ message: "User not found" });
+            }
+            
+            res.status(200).json({ 
+                message: "Profile picture uploaded successfully",
+                profilePicture
+            });
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+        };
+module.exports = { registerUser, loginUser, getUserById, updateUser,uploadProfilePicture };
